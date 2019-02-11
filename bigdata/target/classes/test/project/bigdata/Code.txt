@@ -1,0 +1,395 @@
+package test.project.bigdata;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Scanner;
+import java.util.Set;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.webhoseio.sdk.WebhoseIOClient;
+
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.util.CoreMap;
+
+public class Project {
+	
+	public static ArrayList<String> txt = new ArrayList<String>();
+	public static ArrayList<String> url = new ArrayList<String>();
+	public static ArrayList<String> title = new ArrayList<String>();
+	
+	public static ArrayList<Integer> txtes = new ArrayList<Integer>();
+	public static ArrayList<String> txts = new ArrayList<String>();
+	
+	public static ArrayList<Integer> urles = new ArrayList<Integer>();
+	public static ArrayList<String> urls = new ArrayList<String>();
+	
+	public static ArrayList<Integer> titlees = new ArrayList<Integer>();
+	public static ArrayList<String> titles = new ArrayList<String>();
+	
+	public static ArrayList<String> published = new ArrayList<String>();
+	
+	public static ArrayList<ArrayList<String>> nes = new ArrayList<ArrayList<String>>();
+	public static ArrayList<String> ne = new ArrayList<String>();
+	
+	public static ArrayList<String> checkner = new ArrayList<String>();
+	
+	public static ArrayList<Integer> nou = new ArrayList<Integer>();
+	public static ArrayList<String> checkners = new ArrayList<String>();
+	
+	public static Set<String> hashSet = new HashSet<String>();
+	public static Set<Integer> hashset = new HashSet<Integer>();
+	
+	public static ArrayList<String> checkposnn = new ArrayList<String>();
+	public static ArrayList<String> checkpospn = new ArrayList<String>();
+	public static ArrayList<String> checkposnns = new ArrayList<String>();
+	public static ArrayList<ArrayList<String>> c3pns = new ArrayList<ArrayList<String>>();
+	public static ArrayList<String> checkpospns = new ArrayList<String>();
+	
+	public static String searchs="";
+	public static int z;
+	
+	
+	
+	public static void webhose(String search,String search1) throws Exception, IOException {
+		
+		String searchq=search+" language:english site_type:news site_category:media";
+		String searcht=search1;
+		
+		WebhoseIOClient webhoseClient = WebhoseIOClient.getInstance("8ca4ac56-46dd-4040-8abc-6a141f22afdb");
+		
+        Map<String, String> queries = new HashMap<String, String>();
+        
+        queries.put("q",searchq);
+        queries.put("ts", "1523642416246");
+        queries.put("sort", searcht);
+
+        JsonElement result = webhoseClient.query("filterWebContent", queries);
+        
+        System.out.println(" Total Number of Articles Found = "+result.getAsJsonObject().
+        		get("totalResults"));     // Print posts count
+        
+        JsonArray postArray = result.getAsJsonObject().getAsJsonArray("posts");
+        
+        for(JsonElement o  : postArray) {
+        
+        	url.add((o.getAsJsonObject().get("url").toString()));
+        	title.add((o.getAsJsonObject().get("title").toString()));
+        	published.add((o.getAsJsonObject().get("published").toString()));
+        	txt.add((o.getAsJsonObject().get("text").toString()));
+        	
+	}
+        }
+	
+	
+public static void webhos(String searches) throws Exception, IOException {
+		
+		String searchees=searches+" language:english site_type:news site_category:media";
+		
+		WebhoseIOClient webhoseClient = WebhoseIOClient.getInstance("ba8f4bb7-f20f-459e-8e37-ca6f6e8150b8");
+    
+		Map<String, String> queries = new HashMap<String, String>();
+        
+		queries.put("q",searchees);
+        queries.put("ts", "1523642416246");
+        queries.put("sort", "relevancy");
+
+        JsonElement result = webhoseClient.query("filterWebContent", queries);
+        
+        System.out.println(" Total Number of Articles Found = "+result.getAsJsonObject().
+        
+        		get("totalResults"));     // Print posts count
+        
+        JsonArray postArray = result.getAsJsonObject().getAsJsonArray("posts");
+       
+        for(JsonElement o  : postArray) {
+        	
+        	urls.add((o.getAsJsonObject().get("url").toString()));
+        	titles.add((o.getAsJsonObject().get("title").toString()));
+        	txts.add((o.getAsJsonObject().get("text").toString()));
+        	ne.add((o.getAsJsonObject().get("entities").toString()));
+        	nes.add(ne);
+	}	
+        urles.add(urls.size());
+       
+        titlees.add(titles.size());
+      
+        txtes.add(txts.size());
+        
+        }
+
+	public static void nlp(String nlp) throws Exception, IOException {
+	
+		z=0;
+		
+		nou.add(checkners.size());
+		hashset.addAll(nou);
+		nou.removeAll(nou);
+		nou.addAll(hashset);
+		Collections.sort(nou);
+		hashSet.removeAll(hashSet);
+	
+		//creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER, parsing, and coreference resolution
+	Properties props = new Properties();
+	props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+	
+	
+	//High             //props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner,parse,depparse,coref,kbp,quote");
+	//Computation      // set a property for an annotator, in this case the coref annotator is being set to use the neural algorithm
+	//Requirements     //props.setProperty("coref.algorithm", "neural");
+			
+	StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+
+	// read some text in the text variable
+	String text = nlp;
+	
+	// create an empty Annotation just with the given text
+	Annotation document = new Annotation(text);
+
+	// run all Annotators on this text
+	pipeline.annotate(document);
+	
+	List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
+	
+	String tocs="",tocs1="",tocs2=""; 
+	
+	for (CoreMap sentence : sentences) {
+	    // traversing the words in the current sentence
+	    // a CoreLabel is a CoreMap with additional token-specific methods
+	
+		for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+	        // this is the text of the token
+	        String word = token.get(CoreAnnotations.TextAnnotation.class);
+	        // this is the POS  tag of the token
+	        String pos = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+	        // this is the NER label of the token
+	        String ner = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+	        
+	        //System.out.println(String.format("Print: word:{%s} pos: {%s} ner: {%s}",word,pos,ner));
+	        
+	        if(word.equalsIgnoreCase(searchs)) {
+	        	tocs=word;
+	        	z++;
+	        }
+	        if(searchs.startsWith(word)) {
+	        	tocs1=word;
+	        	z++;
+	        }
+	        if(searchs.endsWith(word)) {
+	        	tocs2=word;
+	        	z++;
+	        }
+	        if(checkner.contains(ner)) {
+	        	
+	        	checkners.add(word);
+	        }
+	        if(checkposnn.contains(pos)) {
+	        	tocs=word;
+	        }
+	        if(checkposnn.contains(pos)) {
+	        	if(tocs.equals(searchs)||tocs1.equals(searchs)||tocs2.equals(searchs)) 
+	        	{
+	        		z++;
+	        	}
+	        }
+	        
+	    }
+	}
+	
+	hashSet.addAll(checkners);
+	checkners.removeAll(checkners);
+	checkners.addAll(hashSet);
+	hashSet.removeAll(hashSet);
+	
+	}
+	
+	public static void main(String[] args) throws Exception, IOException, ArrayIndexOutOfBoundsException {
+
+		nou.add(0);
+	    txtes.add(0);
+	    urles.add(0);
+	    titlees.add(0);
+		  
+		System.out.println("Hi");
+	
+		Scanner sc=new Scanner(System.in);
+		
+		System.out.println("Enter The Topic You would like to search about...");
+		searchs=sc.nextLine();
+		String search2="";
+		
+		System.out.println("Sort Articles Based on... ");
+		System.out.println("Choose an option...");
+		System.out.println("1. Relevancy");
+		System.out.println("2. Rating");
+		System.out.println("3. Published Date");
+		int t=sc.nextInt();
+		
+		switch(t) 
+		{
+		case 1 : search2="relevancy";
+		break;
+		case 2 : search2="rating";
+		break;
+		case 3 : search2="published";
+		break;
+		default : search2="crawled";
+		break;
+		}
+		
+		webhose(searchs,search2);
+		
+		System.out.println("Enter Number of articles you would like to see about the topic...");
+		int ne=sc.nextInt();
+        	
+		sc.nextLine();
+
+System.out.println("Press Enter to Start NLP...!");
+sc.nextLine();
+
+checkpospn.add("PRP$");
+checkpospn.add("PRP");
+checkposnn.add("NNP");
+checkposnn.add("WP");
+checkposnn.add("NN");
+checkposnn.add("NNS");
+checkposnn.add("NNPS");
+checkposnn.add("WP$");
+
+checkner.add("PERSON");
+//checkner.add("ORGANIZATION");
+checkner.add("CITY");
+//checkner.add("LOCATION");
+checkner.add("NAATIONALITY");
+//checkner.add("TITLE");
+
+ArrayList<Integer> per = new ArrayList<Integer>();
+
+		for(int cx=0;cx<ne+1;cx++)
+		{
+		nlp(txt.get(cx));
+		per.add(z);
+		}
+		
+		//nou.remove(nou.size()-1);
+		
+	//	System.out.println(nou);
+	//	System.out.println(checkners);
+		
+    	for(int in=0;in<nou.size();in++) {
+    	
+    	//	System.out.println(checkners.get(nou.get(in)));
+    	
+    	webhos(checkners.get(nou.get(in)));
+    	
+    	//	System.out.println(checkners.get(nou.get(in)+1));
+    	
+    	webhos(checkners.get(nou.get(in)+1));
+    	}
+    	
+    	System.out.println(titlees);
+		System.out.println(urles);
+		System.out.println(txtes);
+		
+		System.out.println(per);
+		
+		File filename=new File("C:/Users/chvkr/eclipse-workspace-web/bigdata/src/main/java/test/project/bigdata/File.txt");
+		BufferedWriter outputWriter = null;
+		outputWriter = new BufferedWriter(new FileWriter(filename));
+		
+    	for(int i=0;i<ne;i++) {
+    			System.out.println("ARTICLE - "+(i+1));
+    			outputWriter.write("MAIN ARTICLE - "+(i+1));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    	
+    			System.out.println("Title : "+title.get(i)+"\n");
+    			outputWriter.write("Title : ");
+    			outputWriter.write(title.get(i));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    			
+    			System.out.println(txt.get(i)+"\n");
+    			outputWriter.write(txt.get(i));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    			
+    			System.out.println("Published On :  "+published.get(i)+"\n");
+    			outputWriter.write("Published On :  ");
+    			outputWriter.write(published.get(i));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    			
+    			System.out.println("Link :  "+url.get(i)+"\n");
+    			outputWriter.write("Link :  ");
+    			outputWriter.write(url.get(i));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    			
+    			System.out.print("MY SCORE  =  "+per.get(i)+"     *This Score Indicates How Much This Article Is About "+searchs+".*\n\n");
+    			outputWriter.write("MY SCORE  =  ");
+    			outputWriter.write(per.get(i).toString());
+    			outputWriter.write("     *This Score Indicates How Much This Article Is About ");
+    			outputWriter.write(searchs);
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    			
+    			System.out.println("Articles Related to Article - "+(i+1));
+    			outputWriter.write("Articles Related to Article - "+(i+1));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    			
+    			for(int j=0;j<2;j++) {
+    			
+    			System.out.println("About : "+checkners.get(nou.get(i)+j));
+    			outputWriter.write("About : ");
+    			outputWriter.write(checkners.get(nou.get(i)+j));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    		
+    			System.out.println("Title : "+titles.get(titlees.get(i)+j)+"\n");    
+    			outputWriter.write("Title : ");
+    			outputWriter.write(titles.get(titlees.get(i)+j));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    			
+    			System.out.println(txts.get(txtes.get(i)+j)+"\n");
+    			outputWriter.write(txts.get(txtes.get(i)+j));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    			
+    			System.out.println("Link :  "+urls.get(urles.get(i)+j)+"\n");
+    			outputWriter.write("Link :  ");
+    			outputWriter.write(urls.get(urles.get(i)+j));
+    			outputWriter.newLine();
+    			outputWriter.newLine();
+    			}
+    			
+    			//	System.out.println(nes.get(i));
+    			 
+    	}System.out.println(checkners.size()+" KeyWords In These Articles... "+checkners);
+    
+    	outputWriter.close();
+    	
+sc.close();
+
+System.out.println();
+System.out.println("		Completed..!  ;) ");
+	}
+
+}
+
+//https://docs.webhose.io/docs/output-reference
+//https://github.com/Webhose/webhoseio-java-sdk
